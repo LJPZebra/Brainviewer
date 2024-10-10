@@ -9,7 +9,7 @@ from napari.utils.notifications import show_error, show_info, show_warning
 class ActivityViewer:
     def __init__(self, brain_viewer, slider_link=False):
         self.nbv = brain_viewer
-        self.v = self.nbv._v
+        self.v = self.nbv._viewer
 
         plt.style.use("dark_background")
         self.canvas = FigureCanvas(Figure(tight_layout=True, frameon=False))
