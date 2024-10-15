@@ -28,18 +28,6 @@ class NapariBrainViewer:
         # setting up the viewer
         self._set_dimensions()
 
-    def add_selection_functionality(self, points_layer, matrix, cmap, crange):
-
-        # callback
-        def show_selection_tab():
-            self._selection_dock = self._viewer.window.add_dock_widget(
-                SelectionTab(self, points_layer, matrix, cmap, crange),
-                name="Selection",
-            )
-
-        # menu entry
-        self._brain_menu.addAction("&Selection tab", show_selection_tab)
-
 
     def _set_dimensions(self):
         d = self._viewer.dims
@@ -64,6 +52,10 @@ class NapariBrainViewer:
     @property
     def viewer(self):
         return self._viewer
+
+    @property
+    def brain_menu(self):
+        return self._brain_menu
 
     def close(self):
         self._viewer.close()
