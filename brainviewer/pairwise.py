@@ -42,3 +42,4 @@ class PointLayerPairwise:
 def change_point_colors(layer, i, colors):
     colors[i, :] = [1, 0, 0, 1]
     layer.face_color = colors
+

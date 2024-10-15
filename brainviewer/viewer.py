@@ -2,38 +2,40 @@ from pathlib import Path
 
 import napari
 import numpy as np
-from napari.utils.notifications import show_error, show_info, show_warning
 from qtpy.QtWidgets import QFileDialog
 
 from .hdf5_handling import HDF5_Browser
+from .selection import SelectionTab
 
 
 class NapariBrainViewer:
     def __init__(self, work_dir=None, space_unit="μm", time_unit="sec"):
-        self._v = napari.Viewer()
+        self._selection_dock = None
+        self._viewer = napari.Viewer()
         self.work_dir = work_dir
         self.space_unit = space_unit
         self.time_unit = time_unit
 
-        # setup custom menu
-        self._brainmenu = self._v.window.main_menu.addMenu("BrainTools")
+        # custom menu
+        self._brain_menu = self._viewer.window.main_menu.addMenu("&BrainTools")
 
         # data loading sub-menu
-        datamenu = self._brainmenu.addMenu("Loading data")
-        datamenu.addAction("load .nrrd", self.load_nrrd)
-        datamenu.addAction("load .zarr", self.load_zarr)
-        datamenu.addAction("load .h5", self.load_hdf5)
+        data_menu = self._brain_menu.addMenu("&Load data")
+        data_menu.addAction("NRRD (.nrrd)", self.load_nrrd)
+        data_menu.addAction("Zarr (.zarr)", self.load_zarr)
+        data_menu.addAction("HDF5 (.h5)", self.load_hdf5)
 
         # setting up the viewer
-        self._set_dimentions()
+        self._set_dimensions()
 
-    def _set_dimentions(self):
-        d = self._v.dims
+
+    def _set_dimensions(self):
+        d = self._viewer.dims
         d.ndim = 4
         d.axis_labels = ["t", "z", "x", "y"]
 
     def _ui_select_files(self, prompt):
-        files = self._v.window._qt_viewer._open_file_dialog_uni(prompt)
+        files = self._viewer.window._qt_viewer._open_file_dialog_uni(prompt)
         return [Path(p) for p in files]
 
     def _ui_select_file(self, prompt):
@@ -43,12 +45,20 @@ class NapariBrainViewer:
 
     def _ui_select_directory(self, prompt):
         dlg = QFileDialog()
-        path = dlg.getExistingDirectory(self._v.window._qt_viewer, prompt)
+        path = dlg.getExistingDirectory(self._viewer.window._qt_viewer, prompt)
         print(path)
         return Path(path)
 
+    @property
+    def viewer(self):
+        return self._viewer
+
+    @property
+    def brain_menu(self):
+        return self._brain_menu
+
     def close(self):
-        self._v.close()
+        self._viewer.close()
 
     def points(
         self,
@@ -71,7 +81,7 @@ class NapariBrainViewer:
             size = 8
 
         if values is None:
-            layer = self._v.add_points(
+            layer = self._viewer.add_points(
                 coords,
                 size=size,
                 out_of_slice_display=True,
@@ -81,7 +91,7 @@ class NapariBrainViewer:
         else:
             assert len(values) == len(coords)
             features = {"val": values}
-            layer = self._v.add_points(
+            layer = self._viewer.add_points(
                 coords,
                 size=size,
                 out_of_slice_display=True,
@@ -104,7 +114,7 @@ class NapariBrainViewer:
 
         imgs, header = nrrd.read(path)
         px_size = header["space directions"][np.diag_indices(3)][::-1]
-        return self._v.add_image(imgs.T, scale=px_size, colormap=cmap)
+        return self._viewer.add_image(imgs.T, scale=px_size, colormap=cmap)
 
     def load_zarr(self, path=None, cmap="magenta"):
         import zarr
@@ -123,4 +133,4 @@ class NapariBrainViewer:
         if path is not None:
             raise NotImplementedError()
 
-        self._h5widget = self._v.window.add_dock_widget(HDF5_Browser(self))
+        self._h5widget = self._viewer.window.add_dock_widget(HDF5_Browser(self))
