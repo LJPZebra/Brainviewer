@@ -38,7 +38,7 @@ def region_pairing(pairing_matrix, region):
     return (pairing_matrix[:,region]).sum(axis=1) / region.size
 
 
-def is_in_convex_polygon(point, vertices):
+def is_in_polygon(point, vertices):
     point = np.array(point)
     vertices = np.array(vertices)
 
@@ -104,7 +104,7 @@ class SelectionTab(QWidget):
             self._selection_layer.unselect_all()
 
             for rectangle in shape_layer.data:
-                self._selection_layer.select_convex(rectangle)
+                self._selection_layer.select_polygon(rectangle)
 
         shape_layer.events.data.connect(on_shape_change)
         self._shape_layers.append(shape_layer)
@@ -127,7 +127,7 @@ class SelectionLayer:
         return np.array(self._selection)
 
 
-    def points_in_convex_selection(self, convex_vertices, thickness=1.5):
+    def points_in_polygon_selection(self, polygon, thickness=1.5):
         points = self._points_layer.data
         selection = []
 
@@ -138,19 +138,19 @@ class SelectionLayer:
         points = points[:, 1:]
 
         for i, point in enumerate(points):
-            if is_in_convex_polygon(point, convex_vertices) and mask_points_in_slice[i]:
+            if is_in_polygon(point, polygon) and mask_points_in_slice[i]:
                 selection.append(i)
 
         return selection
 
 
-    def select_convex(self, convex_vertices):
-        self._selection.extend(self.points_in_convex_selection(convex_vertices))
+    def select_polygon(self, polygon):
+        self._selection.extend(self.points_in_polygon_selection(polygon))
         self.update_selection()
 
 
-    def unselect_convex(self, convex_vertices):
-        selection = self.points_in_convex_selection(convex_vertices)
+    def unselect_polygon(self, polygon):
+        selection = self.points_in_polygon_selection(polygon)
         for i in selection:
             self._selection.remove(i)
         self.update_selection()
