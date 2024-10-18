@@ -106,7 +106,7 @@ class NapariBrainViewer:
 
         return layer
 
-    def load_nrrd(self, path=None, cmap="magenta"):
+    def load_nrrd(self, path=None, cmap="magenta", **kwargs):
         import nrrd
 
         if path is None:
@@ -114,7 +114,7 @@ class NapariBrainViewer:
 
         imgs, header = nrrd.read(path)
         px_size = header["space directions"][np.diag_indices(3)][::-1]
-        return self._viewer.add_image(imgs.T, scale=px_size, colormap=cmap)
+        return self._viewer.add_image(imgs.T, scale=px_size, colormap=cmap, **kwargs)
 
     def load_zarr(self, path=None, cmap="magenta"):
         import zarr
