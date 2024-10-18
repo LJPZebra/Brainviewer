@@ -72,7 +72,7 @@ class NapariBrainViewer:
         assert isinstance(coords, np.ndarray)
         assert coords.ndim == 2
         assert coords.shape[1] == 3
-        coords = coords[:, [2, 1, 0]]
+        coords = coords[:, [2, 0, 1]]
 
         if size is None:
             # if self.pixel_size is not None:
