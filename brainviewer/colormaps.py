@@ -35,6 +35,7 @@ def alpha_sigmoid(cm, x0=0.5, sharpness=20, name="Custom"):
         colors = cm.colors
     else:
         colors = cm(np.linspace(0, 1, 256))
+        colors = colors[:, :3]
 
     x = np.linspace(0, 1, len(colors))
     alpha = 1 - 1 / (1 + np.exp(sharpness * (x - x0)))
