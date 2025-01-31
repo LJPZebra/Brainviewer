@@ -188,8 +188,8 @@ class NapariBrainViewer:
             path = self._ui_select_file("Select .nrrd")
 
         imgs, header = nrrd.read(path)
-        px_size = header["space directions"][np.diag_indices(3)][::-1]
-        return self._viewer.add_image(imgs.T, scale=px_size, colormap=cmap, **kwargs)
+        px_size = header["space directions"][np.diag_indices(3)]  # [::-1]
+        return self._viewer.add_image(imgs, scale=px_size, colormap=cmap, **kwargs)
 
     def load_zarr(self, path=None, cmap="magenta"):
         import zarr
